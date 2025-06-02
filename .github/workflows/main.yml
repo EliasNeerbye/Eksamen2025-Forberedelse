@@ -10,7 +10,7 @@ jobs:
         runs-on: self-hosted
         defaults:
             run:
-                working-directory: /home/harpyadmin/Eksamen2025/Eksamen2025/Eksamen2025
+                working-directory: /home/harpyadmin/Eksamen2025/Eksamen2025-Forberedelse/Eksamen2025-Forberedelse
 
         steps:
             - name: Checkout code
@@ -18,7 +18,7 @@ jobs:
               with:
                   clean: false
                   fetch-depth: 0
-                  path: /home/harpyadmin/Eksamen2025/Eksamen2025/Eksamen2025
+                  path: /home/harpyadmin/Eksamen2025/Eksamen2025-Forberedelse/Eksamen2025-Forberedelse
 
             - name: Check if package.json exists and install dependencies
               run: |
