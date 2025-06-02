@@ -4,7 +4,7 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const helmet = require('helmet');
 
-const config = requrie('./config/config');
+const config = require('./config/config');
 
 const app = express();
 
