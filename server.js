@@ -18,14 +18,6 @@ mongoose
         process.exit(1);
     });
 
-mongoose.connection.on("error", (err) => {
-    console.error("MongoDB connection error:", err);
-});
-
-mongoose.connection.on("disconnected", () => {
-    console.log("MongoDB disconnected");
-});
-
 const corsOptions = {
     origin: config.ORIGINS,
     credentials: true,
