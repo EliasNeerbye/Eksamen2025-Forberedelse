@@ -4,41 +4,36 @@ const { generateToken } = require('../../utils/jwtUtil');
 const { createJwtCookie } = require('../../utils/cookie');
 
 module.exports = async (req, res) => {
-    const { username, email, password } = req.body;
-    if (!username && !email) {
+    const { username, email, password } = req.body; if (!username && !email) {
         return res.status(400).json({
             msg: null,
             error: 'Username or email is required',
-            user: null
+            data: null
         });
-    }
-    if (!password) {
+    } if (!password) {
         return res.status(400).json({
             msg: null,
             error: 'Password is required',
-            user: null
+            data: null
         });
     }
 
     try {
         const user = await User.findOne({
             $or: [{ username }, { email }]
-        });
-
-        if (!user) {
+        }); if (!user) {
             return res.status(404).json({
                 msg: null,
                 error: 'User not found',
-                user: null
+                data: null
             });
         }
 
-        const isPasswordValid = await verifyPassword(password, user.password);
-        if (!isPasswordValid) {
+        const isPasswordValid = await verifyPassword(password, user.password); if (!isPasswordValid) {
             return res.status(401).json({
                 msg: null,
                 error: 'Invalid password',
-                user: null
+                data: null
             });
         }
 
@@ -46,22 +41,18 @@ module.exports = async (req, res) => {
             id: user._id,
             username: user.username,
             email: user.email,
-        });
-
-        if (!token) {
+        }); if (!token) {
             return res.status(500).json({
                 msg: null,
                 error: 'Error generating token',
-                user: null
+                data: null
             });
         }
 
-        createJwtCookie(res, token);
-
-        res.status(200).json({
+        createJwtCookie(res, token); res.status(200).json({
             msg: 'Login successful',
             error: null,
-            user: {
+            data: {
                 id: user._id,
                 username: user.username,
                 email: user.email,
@@ -69,11 +60,10 @@ module.exports = async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Error logging in:', error);
-        res.status(500).json({
+        console.error('Error logging in:', error); res.status(500).json({
             msg: null,
             error: 'Internal server error',
-            user: null
+            data: null
         });
     }
 }

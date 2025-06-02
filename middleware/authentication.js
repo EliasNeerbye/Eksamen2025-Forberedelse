@@ -37,7 +37,7 @@ const authenticateUser = (req, res, next) => {
         return res.status(401).json({
             msg: null,
             error: 'Access denied. Authentication required.',
-            user: null
+            data: null
         });
     }
     next();
@@ -48,7 +48,7 @@ const stopUser = (req, res, next) => {
         return res.status(403).json({
             msg: null,
             error: 'Access denied. Already authenticated.',
-            user: null
+            data: null
         });
     }
     next();

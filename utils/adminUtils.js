@@ -1,34 +1,18 @@
 const User = require('../models/User');
 
-const amIAdmin = async (req, res) => {
-    if (!req.user || !req.user.id) {
-        return res.status(401).json({
-            msg: null,
-            error: 'Authentication required',
-            user: null
-        });
+const amIAdmin = async (req) => {
+    if (!req.user || !req.user._id) {
+        return false;
     }
     try {
-        const user = await User.findById(req.user.id);
-
+        const user = await User.findById(req.user._id);
         if (!user) {
-            return res.status(404).json({
-                msg: null,
-                error: 'User not found',
-                user: null
-            });
+            return false;
         }
-
-        const isAdmin = user.role === 'admin';
-
-        return isAdmin;
+        return user.role === 'admin';
     } catch (error) {
         console.error('Error checking admin status:', error);
-        return res.status(500).json({
-            msg: null,
-            error: 'Internal server error',
-            user: null
-        });
+        return false;
     }
 }
 module.exports = {

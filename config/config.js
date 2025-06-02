@@ -18,8 +18,11 @@ const HTTPS_ENABLED = process.env.HTTPS_ENABLED === 'true' || false;
 // Example: development
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
-if (!DB_URL || !JWT_SECRET) {
-    console.error('Missing required environment variables: DB_URL or JWT_SECRET');
+const requiredEnvVars = ['DB_URL', 'JWT_SECRET'];
+const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+
+if (missingVars.length > 0) {
+    console.error(`Missing required environment variables: ${missingVars.join(', ')}`);
     process.exit(1);
 }
 
