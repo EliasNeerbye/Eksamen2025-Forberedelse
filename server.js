@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const helmet = require("helmet");
-const mongoSanitize = require("express-mongo-sanitize");
 
 const config = require("./config/config");
 
@@ -34,7 +33,6 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 app.use(helmet());
-app.use(mongoSanitize());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
