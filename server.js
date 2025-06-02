@@ -26,17 +26,6 @@ mongoose.connection.on("disconnected", () => {
     console.log("MongoDB disconnected");
 });
 
-mongoose.connection.once("open", async () => {
-    console.log("Connected to MongoDB");
-
-    try {
-        await mongoose.connection.db.collection("users").findOne();
-        console.log("Database initialized");
-    } catch (err) {
-        console.error("Error initializing database:", err);
-    }
-});
-
 const corsOptions = {
     origin: config.ORIGINS,
     credentials: true,
