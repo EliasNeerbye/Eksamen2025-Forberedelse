@@ -29,12 +29,11 @@ mongoose.connection.on("disconnected", () => {
 mongoose.connection.once("open", async () => {
     console.log("Connected to MongoDB");
 
-    // Initialize database by checking if users collection exists
     try {
         await mongoose.connection.db.collection("users").findOne();
         console.log("Database initialized");
     } catch (err) {
-        console.log("Initializing database...");
+        console.error("Error initializing database:", err);
     }
 });
 
