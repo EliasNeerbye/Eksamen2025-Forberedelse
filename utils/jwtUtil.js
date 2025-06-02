@@ -4,8 +4,8 @@ const config = require('../config/config');
 const generateToken = (user) => {
     const payload = {
         id: user._id,
+        username: user.username,
         email: user.email,
-        role: user.role
     };
 
     return jsonwebtoken.sign(payload, config.JWT_SECRET, { expiresIn: '7d' });

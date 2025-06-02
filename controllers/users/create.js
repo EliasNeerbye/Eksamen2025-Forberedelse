@@ -1,5 +1,6 @@
-const User = require('../../models/user');
+const User = require('../../models/User');
 const validateUser = require('../../utils/validateUser');
+const { hashPassword } = require('../../utils/hashing')
 
 module.exports = async (req, res) => {
     try {
@@ -19,7 +20,12 @@ module.exports = async (req, res) => {
             return res.status(400).json({ msg: null, error: 'User with this email or username already exists.', newUser: null });
         };
 
-        const newUser = new User({ username, email, password });
+        const hashedPassword = await hashPassword(password);
+        if (!hashedPassword) {
+            return res.status(500).json({ msg: null, error: 'Error hashing password', newUser: null });
+        }
+
+        const newUser = new User({ username, email, password: hashedPassword });
         await newUser.save();
 
         res.status(201).json({ msg: 'User created successfully', error: null, newUser });

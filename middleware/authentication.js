@@ -20,8 +20,8 @@ const checkUser = async (req, res, next) => {
 
         req.user = {
             id: decoded.id,
+            username: decoded.username,
             email: decoded.email,
-            role: decoded.role
         };
 
         next();
