@@ -3,7 +3,7 @@ const validateUser = require('../../utils/validateUser');
 const { amIAdmin } = require('../../utils/adminUtils');
 const { hashPassword } = require('../../utils/hashing');
 
-const updateUser = async (req, res) => {
+module.exports = async (req, res) => {
     if (!req.user || !req.user.id) {
         return res.status(401).json({
             msg: null,
@@ -76,5 +76,3 @@ const updateUser = async (req, res) => {
         });
     }
 }
-
-module.exports = updateUser;

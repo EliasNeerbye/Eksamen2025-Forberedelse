@@ -3,7 +3,7 @@ const { verifyPassword } = require('../../utils/hashing');
 const { generateToken } = require('../../utils/jwtUtil');
 const { createJwtCookie } = require('../../utils/cookie');
 
-const loginUser = async (req, res) => {
+module.exports = async (req, res) => {
     const { username, email, password } = req.body;
     if (!username && !email) {
         return res.status(400).json({
@@ -77,5 +77,3 @@ const loginUser = async (req, res) => {
         });
     }
 }
-
-module.exports = loginUser;
