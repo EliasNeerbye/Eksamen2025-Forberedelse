@@ -1,5 +1,5 @@
-const { verifyToken } = require('../utils/jwtUtil');
-const { checkIfValidJwtCookie } = require('../utils/cookie');
+const { verifyToken } = require("../utils/jwtUtil");
+const { checkIfValidJwtCookie } = require("../utils/cookie");
 
 const checkUser = async (req, res, next) => {
     try {
@@ -19,14 +19,14 @@ const checkUser = async (req, res, next) => {
         const decoded = verifyToken(token);
 
         req.user = {
-            id: decoded.id,
+            id: decoded._id,
             username: decoded.username,
             email: decoded.email,
         };
 
         next();
     } catch (error) {
-        console.error('Check user error:', error);
+        console.error("Check user error:", error);
         req.user = null;
         next();
     }
@@ -36,8 +36,8 @@ const authenticateUser = (req, res, next) => {
     if (!req.user) {
         return res.status(401).json({
             msg: null,
-            error: 'Access denied. Authentication required.',
-            data: null
+            error: "Access denied. Authentication required.",
+            data: null,
         });
     }
     next();
@@ -47,8 +47,8 @@ const stopUser = (req, res, next) => {
     if (req.user) {
         return res.status(403).json({
             msg: null,
-            error: 'Access denied. Already authenticated.',
-            data: null
+            error: "Access denied. Already authenticated.",
+            data: null,
         });
     }
     next();
@@ -57,5 +57,5 @@ const stopUser = (req, res, next) => {
 module.exports = {
     checkUser,
     authenticateUser,
-    stopUser
+    stopUser,
 };

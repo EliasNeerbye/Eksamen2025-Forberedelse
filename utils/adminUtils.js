@@ -1,4 +1,4 @@
-const User = require('../models/User');
+const User = require("../models/User");
 
 const amIAdmin = async (req) => {
     if (!req.user || !req.user._id) {
@@ -9,12 +9,12 @@ const amIAdmin = async (req) => {
         if (!user) {
             return false;
         }
-        return user.role === 'admin';
+        return user.role === "admin";
     } catch (error) {
-        console.error('Error checking admin status:', error);
+        console.error("Error checking admin status:", error);
         return false;
     }
-}
+};
 module.exports = {
-    amIAdmin
+    amIAdmin,
 };
