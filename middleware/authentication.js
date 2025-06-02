@@ -19,7 +19,7 @@ const checkUser = async (req, res, next) => {
         const decoded = verifyToken(token);
 
         req.user = {
-            id: decoded._id,
+            _id: decoded._id,
             username: decoded.username,
             email: decoded.email,
         };

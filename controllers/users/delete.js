@@ -1,4 +1,5 @@
 const User = require("../../models/User");
+const { amIAdmin } = require("../../utils/adminUtils");
 
 module.exports = async (req, res) => {
     if (!req.user || !req.user._id) {
@@ -26,6 +27,15 @@ module.exports = async (req, res) => {
         return res.status(500).json({
             msg: null,
             error: "Error fetching user",
+            data: null,
+        });
+    }
+
+    const adminCheck = await amIAdmin(req);
+    if (usernameToDelete !== req.user.username && !adminCheck) {
+        return res.status(403).json({
+            msg: null,
+            error: "Access denied. You can only delete your own profile.",
             data: null,
         });
     }

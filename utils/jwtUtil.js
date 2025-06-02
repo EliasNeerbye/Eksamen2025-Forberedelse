@@ -3,7 +3,7 @@ const config = require("../config/config");
 
 const generateToken = (user) => {
     const payload = {
-        id: user._id,
+        _id: user._id,
         username: user.username,
         email: user.email,
     };
