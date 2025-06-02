@@ -12,6 +12,7 @@ const {
     stopUser,
     authenticateUser,
 } = require("../middleware/authentication");
+const { checkAdminRole } = require("../middleware/authorization");
 
 const createUser = require("../controllers/users/create");
 const getUser = require("../controllers/users/get");
@@ -42,6 +43,12 @@ router.post("/logout", authenticateUser, logoutUser);
 
 router.put("/:username", authenticateUser, validateUserUpdate, updateUser);
 
-router.delete("/:username", authenticateUser, validateUsername, deleteUser);
+router.delete(
+    "/:username",
+    authenticateUser,
+    checkAdminRole,
+    validateUsername,
+    deleteUser
+);
 
 module.exports = router;
