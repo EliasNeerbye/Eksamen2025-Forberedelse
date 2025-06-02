@@ -1,4 +1,4 @@
-const User = require('../../models/User');
+const User = require('../models/User');
 
 const amIAdmin = async (req, res) => {
     if (!req.user || !req.user.id) {
