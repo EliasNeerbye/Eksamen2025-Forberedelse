@@ -4,6 +4,14 @@ module.exports = async (req, res) => {
     try {
         const users = await User.find({}, "username");
 
+        if (!users || users.length === 0) {
+            return res.status(404).json({
+                msg: "No users found",
+                error: null,
+                data: null,
+            });
+        }
+
         const usernames = users.map((user) => user.username);
 
         res.status(200).json({
