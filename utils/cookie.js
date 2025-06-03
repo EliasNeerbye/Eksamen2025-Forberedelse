@@ -17,7 +17,6 @@ const checkIfValidJwtCookie = async (token) => {
     try {
         const blacklisted = await JwtBlacklist.findOne({ token });
         if (blacklisted) {
-            console.log("Token is blacklisted");
             return false;
         }
         return true;
@@ -38,7 +37,6 @@ const clearJwtCookie = async (res, token = null) => {
     if (token) {
         try {
             await JwtBlacklist.create({ token });
-            console.log("JWT cookie cleared and token added to blacklist");
         } catch (err) {
             console.error("Error adding JWT to blacklist:", err);
         }

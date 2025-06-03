@@ -6,7 +6,10 @@ module.exports = async (req, res) => {
     try {
         const { username, email, password } = req.body;
 
-        const validation = validateUser({ username, email, password });
+        const validation = validateUser(
+            { username, email, password },
+            { isUpdate: false }
+        );
         if (!validation.isValid) {
             return res
                 .status(400)
@@ -17,23 +20,19 @@ module.exports = async (req, res) => {
             $or: [{ email }, { username }],
         });
         if (existingUser) {
-            return res
-                .status(400)
-                .json({
-                    msg: null,
-                    error: "User with this email or username already exists.",
-                    data: null,
-                });
+            return res.status(400).json({
+                msg: null,
+                error: "User with this email or username already exists.",
+                data: null,
+            });
         }
         const hashedPassword = await hashPassword(password);
         if (!hashedPassword) {
-            return res
-                .status(500)
-                .json({
-                    msg: null,
-                    error: "Error hashing password",
-                    data: null,
-                });
+            return res.status(500).json({
+                msg: null,
+                error: "Error hashing password",
+                data: null,
+            });
         }
         const newUser = new User({ username, email, password: hashedPassword });
         await newUser.save();

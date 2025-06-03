@@ -44,7 +44,10 @@ module.exports = async (req, res) => {
 
     const { username, email, password, role } = req.body;
 
-    const validation = validateUser({ username, email, password });
+    const validation = validateUser(
+        { username, email, password },
+        { isUpdate: true }
+    );
     if (!validation.isValid) {
         return res
             .status(400)
@@ -52,18 +55,45 @@ module.exports = async (req, res) => {
     }
 
     try {
+        if (username && username !== user.username) {
+            const existingUsername = await User.findOne({ username });
+            if (existingUsername) {
+                return res.status(400).json({
+                    msg: null,
+                    error: "Username already exists.",
+                    data: null,
+                });
+            }
+        }
+
+        if (email && email !== user.email) {
+            const existingEmail = await User.findOne({ email });
+            if (existingEmail) {
+                return res.status(400).json({
+                    msg: null,
+                    error: "Email already exists.",
+                    data: null,
+                });
+            }
+        }
+
         if (username) user.username = username;
         if (email) user.email = email;
-        const hashedPassword = password ? await hashPassword(password) : null;
-        if (!hashedPassword && password) {
-            return res.status(500).json({
-                msg: null,
-                error: "Error hashing password",
-                data: null,
-            });
+
+        if (password) {
+            const hashedPassword = await hashPassword(password);
+            if (!hashedPassword) {
+                return res.status(500).json({
+                    msg: null,
+                    error: "Error hashing password",
+                    data: null,
+                });
+            }
+            user.password = hashedPassword;
         }
-        if (hashedPassword) user.password = hashedPassword;
+
         if (role && adminCheck) user.role = role;
+
         await user.save();
 
         const userResponse = {
@@ -72,6 +102,7 @@ module.exports = async (req, res) => {
             email: user.email,
             role: user.role,
         };
+
         res.status(200).json({
             msg: "User updated successfully",
             error: null,
