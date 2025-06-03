@@ -1,22 +1,40 @@
 # User API - Eksamen2025 (Forberedelse)
 
-A RESTful API for user management with authentication, built with Node.js, Express, and MongoDB. Features secure password hashing, JWT-based authentication with cookies, role-based authorization, and comprehensive input validation.
-
 ## Features
 
--   **User Registration & Authentication**: Secure user creation with password hashing (Argon2)
--   **JWT Authentication**: Cookie-based JWT tokens with blacklist support
--   **Role-Based Access Control**: User and admin roles with different permissions
+-   **Secure Authentication**: Argon2 password hashing + JWT cookies with blacklist support
+-   **Role-Based Access**: User and admin roles with different permissions
 -   **Input Validation**: Comprehensive validation using express-validator
--   **Rate Limiting**: Protection against brute force attacks
--   **Security Headers**: Helmet.js for enhanced security
--   **CORS Support**: Configurable cross-origin resource sharing
+-   **Security**: Rate limiting, CORS, Helmet.js security headers
+-   **Database**: MongoDB with Mongoose ODM
 
-## API Documentation
+## Quick Start
 
-Base URL: `http://userapi.harpy.ikt-fag.no/api/users`
+1. **Install dependencies**
 
-All responses follow this format:
+    ```bash
+    npm install
+    ```
+
+2. **Configure environment**
+
+    ```bash
+    cp .env.example .env
+    # Edit .env with your database URL and generate JWT secret:
+    node generate-jwt.js
+    ```
+
+3. **Start server**
+
+    ```bash
+    npm start
+    ```
+
+## API Reference
+
+**Base URL:** `/api/users`
+
+All responses use this format:
 
 ```json
 {
@@ -28,7 +46,7 @@ All responses follow this format:
 
 ### Authentication
 
-The API uses HTTP-only cookies for JWT authentication. After successful login, the JWT token is automatically included in subsequent requests.
+The API uses HTTP-only cookies for JWT authentication. Tokens are automatically included after login.
 
 ---
 
@@ -36,22 +54,19 @@ The API uses HTTP-only cookies for JWT authentication. After successful login, t
 
 #### **POST** `/api/users`
 
-**Create a new user account**
+Create new user account
 
-**Authentication:** None required  
-**Rate Limited:** 100 requests per 15 minutes
-
-**Request Body:**
+**Body:**
 
 ```json
 {
     "username": "string (3-50 chars, alphanumeric + underscore)",
-    "email": "string (valid email, max 254 chars)",
-    "password": "string (min 6 chars, must contain uppercase, lowercase, and number)"
+    "email": "string (valid email)",
+    "password": "string (min 6 chars, uppercase + lowercase + number)"
 }
 ```
 
-**Response (201 Created):**
+**Response (201):**
 
 ```json
 {
@@ -66,194 +81,65 @@ The API uses HTTP-only cookies for JWT authentication. After successful login, t
 }
 ```
 
-**Error Response (400 Bad Request):**
-
-```json
-{
-    "msg": null,
-    "error": "Validation error message",
-    "data": null
-}
-```
-
 ---
 
 #### **POST** `/api/users/login`
 
-**Authenticate user and create session**
+Authenticate user
 
-**Authentication:** None required (blocks if already authenticated)  
-**Rate Limited:** 100 requests per 15 minutes
-
-**Request Body:**
+**Body:**
 
 ```json
 {
     "username": "string (optional if email provided)",
     "email": "string (optional if username provided)",
-    "password": "string (required)"
+    "password": "string"
 }
 ```
 
-**Response (200 OK):**
-
-```json
-{
-    "msg": "Login successful",
-    "error": null,
-    "data": {
-        "id": "user_id",
-        "username": "username",
-        "email": "email@example.com",
-        "role": "user"
-    }
-}
-```
-
-**Error Response (401 Unauthorized):**
-
-```json
-{
-    "msg": null,
-    "error": "Invalid password",
-    "data": null
-}
-```
+**Response (200):** Returns user data and sets JWT cookie
 
 ---
 
 #### **POST** `/api/users/logout`
 
-**End user session and blacklist JWT token**
+End session (requires authentication)
 
-**Authentication:** Required  
-**Rate Limited:** 100 requests per 15 minutes
-
-**Request Body:** None
-
-**Response (200 OK):**
-
-```json
-{
-    "msg": "Logout successful",
-    "error": null,
-    "data": null
-}
-```
+**Response (200):** Clears cookie and blacklists token
 
 ---
 
 #### **GET** `/api/users/:username`
 
-**Retrieve specific user information**
+Get user by username
 
-**Authentication:** None required  
-**Rate Limited:** 100 requests per 15 minutes
-
-**Path Parameters:**
-
--   `username`: The username to retrieve (3-50 characters)
-
-**Response (200 OK):**
-
-```json
-{
-    "msg": "User found successfully",
-    "error": null,
-    "data": {
-        "_id": "user_id",
-        "username": "username",
-        "email": "email@example.com",
-        "role": "user"
-    }
-}
-```
-
-**Error Response (404 Not Found):**
-
-```json
-{
-    "msg": null,
-    "error": "User not found",
-    "data": null
-}
-```
+**Response (200):** Returns user data (no password)
 
 ---
 
 #### **GET** `/api/users`
 
-**Retrieve all usernames**
+Get all usernames
 
-**Authentication:** None required  
-**Rate Limited:** 100 requests per 15 minutes
-
-**Response (200 OK):**
-
-```json
-{
-    "msg": "Users retrieved successfully",
-    "error": null,
-    "data": ["username1", "username2", "username3"]
-}
-```
-
-**Error Response (404 Not Found):**
-
-```json
-{
-    "msg": "No users found",
-    "error": null,
-    "data": null
-}
-```
+**Response (200):** Returns array of usernames
 
 ---
 
 #### **PUT** `/api/users/:username`
 
-**Update user information**
+Update user (requires authentication)
 
-**Authentication:** Required (can only update own profile unless admin)  
-**Rate Limited:** 100 requests per 15 minutes
+-   Users can only update their own profile
+-   Admins can update any profile and change roles
 
-**Path Parameters:**
-
--   `username`: The username to update
-
-**Request Body (all fields optional):**
+**Body (all optional):**
 
 ```json
 {
-    "username": "string (3-50 chars, alphanumeric + underscore)",
-    "email": "string (valid email, max 254 chars)",
-    "password": "string (min 6 chars, must contain uppercase, lowercase, and number)",
-    "role": "string (admin only - 'user' or 'admin')"
-}
-```
-
-**Response (200 OK):**
-
-```json
-{
-    "msg": "User updated successfully",
-    "error": null,
-    "data": {
-        "_id": "user_id",
-        "username": "new_username",
-        "email": "new_email@example.com",
-        "role": "user"
-    }
-}
-```
-
-**Error Response (403 Forbidden):**
-
-```json
-{
-    "msg": null,
-    "error": "Access denied. You can only update your own profile.",
-    "data": null
+    "username": "string",
+    "email": "string",
+    "password": "string",
+    "role": "string (admin only)"
 }
 ```
 
@@ -261,121 +147,71 @@ The API uses HTTP-only cookies for JWT authentication. After successful login, t
 
 #### **DELETE** `/api/users/:username`
 
-**Delete user account**
+Delete user (admin only)
 
-**Authentication:** Required (Admin only)  
-**Rate Limited:** 100 requests per 15 minutes
-
-**Path Parameters:**
-
--   `username`: The username to delete (3-50 characters)
-
-**Response (200 OK):**
-
-```json
-{
-    "msg": "User deleted successfully",
-    "error": null,
-    "data": null
-}
-```
-
-**Error Response (403 Forbidden):**
-
-```json
-{
-    "msg": null,
-    "error": "Admin access required. Insufficient privileges.",
-    "data": null
-}
-```
+**Response (200):** Confirmation message
 
 ---
 
-## IP Address Table
+## Security Features
 
-| Service               | IP Address     | Description                        |
-| --------------------- | -------------- | ---------------------------------- |
-| **School Server DNS** | `10.10.1.30`   | School network DNS server          |
-| **Harpy Windows DNS** | `10.12.90.10`  | Windows DNS server                 |
-| **User API**          | `10.12.90.100` | Main API server (this application) |
-| **User API Database** | `10.12.90.101` | MongoDB database server            |
+-   **Argon2** password hashing
+-   **JWT blacklisting** on logout
+-   **Rate limiting** (100 requests/15 minutes)
+-   **Input validation** on all endpoints
+-   **HTTP-only cookies** for token storage
+-   **CORS** configuration
+-   **Security headers** via Helmet.js
 
-## Installation & Setup
+## Environment Variables
 
-1. **Clone the repository**
+```env
+DB_URL=mongodb://user:password@host:port/database?authSource=admin
+PORT=3000
+NODE_ENV=production
+JWT_SECRET=your_generated_secret_here
+ORIGINS=https://yourdomain.com,https://api.yourdomain.com
+HTTPS_ENABLED=false
+```
 
-    ```bash
-    git clone <repository-url>
-    cd eksamen2025
-    ```
+## Architecture
 
-2. **Install dependencies**
+### Network Diagram
 
-    ```bash
-    npm install
-    ```
+![Network Diagram](./README_Images/NetworkDiagram.png)
 
-3. **Environment Configuration**
+### Database Schema
 
-    - Copy `.env.example` to `.env`
-    - Update configuration values:
-        ```env
-        DB_URL=mongodb://api_user:SecurePass123!@10.12.90.101:27017/userapi?authSource=admin
-        PORT=3000
-        NODE_ENV=production
-        JWT_SECRET=your_generated_jwt_secret_here
-        ORIGINS=https://yourdomain.com,https://api.yourdomain.com
-        HTTPS_ENABLED=false
-        ```
+![ER Diagram](./README_Images/ErDiagram.png)
 
-4. **Generate JWT Secret**
+### IP Address Table
 
-    ```bash
-    node generate-jwt.js
-    ```
-
-5. **Start the server**
-    ```bash
-    npm start
-    ```
+| Service               | IP Address     | Description                            |
+| --------------------- | -------------- | -------------------------------------- |
+| **School Server DNS** | `10.10.1.30`   | Skole nettverks DNS server             |
+| **Harpy Windows DNS** | `10.12.90.10`  | Windows DNS server                     |
+| **User API**          | `10.12.90.100` | Hoved API server (denne applikasjonen) |
+| **User API Database** | `10.12.90.101` | MongoDB database server                |
 
 ## Technology Stack
 
 -   **Runtime:** Node.js
 -   **Framework:** Express.js
--   **Database:** MongoDB with Mongoose ODM
--   **Authentication:** JSON Web Tokens (JWT)
--   **Password Hashing:** Argon2
+-   **Database:** MongoDB + Mongoose
+-   **Authentication:** JWT + Argon2
 -   **Validation:** express-validator
 -   **Security:** Helmet.js, CORS, Rate Limiting
--   **Cookie Management:** cookie-parser
-
-## Security Features
-
--   **Password Hashing:** Argon2 algorithm for secure password storage
--   **JWT Blacklisting:** Logout functionality adds tokens to blacklist
--   **Rate Limiting:** 100 requests per 15-minute window
--   **Input Validation:** Comprehensive validation on all endpoints
--   **Security Headers:** Helmet.js for XSS protection and security headers
--   **CORS Configuration:** Configurable cross-origin resource sharing
--   **HTTP-Only Cookies:** JWT tokens stored in secure, HTTP-only cookies
 
 ## Error Codes
 
--   `200` - Success
--   `201` - Resource created successfully
+-   `200/201` - Success
 -   `400` - Bad request (validation errors)
--   `401` - Unauthorized (authentication required)
+-   `401` - Unauthorized
 -   `403` - Forbidden (insufficient privileges)
--   `404` - Resource not found
--   `429` - Too many requests (rate limit exceeded)
--   `500` - Internal server error
-
-## Development
-
-The application uses PM2 for process management in production and includes GitHub Actions for automated deployment to the API VM.
+-   `404` - Not found
+-   `429` - Rate limit exceeded
+-   `500` - Server error
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+GNU General Public License v3.0 - see [LICENSE](LICENSE) file for details.
